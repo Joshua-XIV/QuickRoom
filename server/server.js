@@ -7,13 +7,14 @@ require('dotenv').config();
 const SALT_ROUNDS = 10;
 const rooms = {};
 const MAX_ATTEMPTS = 30;
+const ROOM_EXPIRATION_MS = 2 * 60 * 1000;
 
 app.get('/api/rooms', (req, res) => {
     const safeRooms = {};
 
     for (const [code, room] of Object.entries(rooms)) {
         safeRooms[code] = {
-            code: room.code,
+            code,
             maxUsers: room.maxUsers,
             isPrivate: room.isPrivate
         }
@@ -23,10 +24,19 @@ app.get('/api/rooms', (req, res) => {
 });
 
 app.post('/api/rooms', async (req, res) => {
-    const { password = '', maxUsers = 10, isPrivate = false } = req.body;
-    let hashedPassword = '';
+    const { username, password, maxUsers = 10, isPrivate = false} = req.body;
+    let hashedPassword = null;
     let code;
     let attempts = 0;
+
+    if (password && password.length < 4) {
+        return res.status(400).json({ error: 'Password must be at least 4 characters' });
+    }
+
+    const trimmed = username.trim();
+    if (trimmed.length < 2 || trimmed.length > 20) {
+        return res.status(403).json({ error: 'Username must be 2-20 characters' });
+    }
 
     if (password) {
         hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -75,7 +85,7 @@ app.post('/api/rooms/:code/join', async (req, res) => {
     if (room.users.length === 0 && cleanupTimers[code])
         cancelRoomCleanup(code);
 
-    room.users.push(username);
+    room.users.push(trimmed);
     res.json({message: `User ${username} joined the room`, roomCode: code})
 });
 
@@ -112,7 +122,7 @@ function scheduleRoomCleanup(code) {
         delete rooms[code];
         delete cleanupTimers[code];
         console.log(`Room ${code} inactive, freeing memory`)
-    }, 2 * 60 * 1000);
+    }, ROOM_EXPIRATION_MS);
 }
 
 function cancelRoomCleanup(code) {
