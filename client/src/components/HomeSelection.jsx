@@ -15,13 +15,14 @@ const HomeSelection = () => {
     setShowCreateRoomPopup(false)
   }
 
-  const handleCreateRoom = async () => {
+  const handleCreateRoom = async ({ username, password, maxUsers, isPrivate }) => {
     try {
-      const data = await createRoom({ password: '', maxUsers: 10, isPrivate: false });
-      toast.success("Success");
+      const data = await createRoom({ username, password, maxUsers, isPrivate });
+      toast.success("Room created successfully!");
+      setShowCreateRoomPopup(false);
     } catch (err) {
-      console.error(err.message);
-      toast.error("Error");
+      console.error(err);
+      toast.error(err.message || "Failed to create room.");
     }
   };
 
@@ -38,7 +39,9 @@ const HomeSelection = () => {
         <HomeButton text="Create a Room" action={handleCreateRoomClick}></HomeButton>
         <HomeButton text="Browse Rooms"></HomeButton>
       </div>
-      <div className='fixed flex justify-center items-center'>{showCreateRoomPopup && <CreateRoomPopup></CreateRoomPopup>}</div>
+      <div className='fixed flex justify-center items-center'>
+        {showCreateRoomPopup && <CreateRoomPopup onClose={handleCreateRoomClose} onCreate={handleCreateRoom}></CreateRoomPopup>}
+      </div>
     </div>
     <ToastContainer className='fixed top-2'></ToastContainer>
     </>

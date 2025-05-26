@@ -16,7 +16,7 @@ app.get('/api/rooms', (req, res) => {
         safeRooms[code] = {
             code,
             maxUsers: room.maxUsers,
-            isPrivate: room.isPrivate
+            isPrivate: room.isPrivate,
         }
     }
 
@@ -29,13 +29,17 @@ app.post('/api/rooms', async (req, res) => {
     let code;
     let attempts = 0;
 
-    if (password && password.length < 4) {
-        return res.status(400).json({ error: 'Password must be at least 4 characters' });
+    if (password && (password.length < 4 || password.length > 20)) {
+        return res.status(400).json({ error: 'Password must be 4-20 characters' });
     }
 
     const trimmed = username.trim();
     if (trimmed.length < 2 || trimmed.length > 20) {
         return res.status(403).json({ error: 'Username must be 2-20 characters' });
+    }
+
+    if (maxUsers < 2 || maxUsers > 20) {
+        return res.status(403).json({ error: 'User count must be 2-20 people'})
     }
 
     if (password) {
@@ -50,7 +54,7 @@ app.post('/api/rooms', async (req, res) => {
         }
     } while (rooms[code]);
     rooms[code] = { 
-        users: [],
+        users: [username],
         password: hashedPassword,
         maxUsers: parseInt(maxUsers),
         isPrivate,
