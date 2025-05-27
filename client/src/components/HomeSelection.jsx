@@ -6,9 +6,11 @@ import {toast, ToastContainer} from 'react-toastify'
 import CreateRoomPopup from './CreateRoomPopup';
 import { useNavigate } from 'react-router-dom';
 import { joinRoom } from '../api/joinRoom';
+import JoinRoomPopup from './JoinRoomPopup';
 
 const HomeSelection = () => {
   const[showCreateRoomPopup, setShowCreateRoomPopup] = useState(false);
+  const[showJoinRoomPopup, setJoinRoomPopup] = useState(false);
   const[inputCode, setInputCode] = useState('');
   
   const handleCreateRoomClick = (e) => {
@@ -16,6 +18,12 @@ const HomeSelection = () => {
   }
   const handleCreateRoomClose = (e) => {
     setShowCreateRoomPopup(false);
+  }
+  const handleJoinRoomClick = (e) => {
+    setJoinRoomPopup(true)
+  }
+  const handleJoinRoomClose = (e) => {
+    setJoinRoomPopup(false)
   }
 
   const navigate = useNavigate();
@@ -33,13 +41,13 @@ const HomeSelection = () => {
     }
   };
 
-  const handleJoinRoom = async ({code}) => {
+  const handleJoinRoom = async ({code, username, password}) => {
     if (!inputCode) {
       toast.error("Invalid Code");
       return;
     }
     try {
-      const data = await joinRoom({code});
+      const data = await joinRoom({code, username, password});
       toast.success("Room Joined!")
       navigate(`/room/${data.roomCode}`);
     } catch (err) {
@@ -58,12 +66,15 @@ const HomeSelection = () => {
         placeholder:text-sm text-1xl focus:border-blue-500 focus:outline-none text-center'
         onChange={e => setInputCode(e.target.value)}>
         </input>
-        <HomeButton text="Join Room Code" action={() => handleJoinRoom({code: inputCode})}/>
+        <HomeButton text="Join Room Code" action={handleJoinRoomClick}/>
         <HomeButton text="Create a Room" action={handleCreateRoomClick}></HomeButton>
         <HomeButton text="Browse Rooms"></HomeButton>
       </div>
       <div className='fixed flex justify-center items-center'>
         {showCreateRoomPopup && <CreateRoomPopup onClose={handleCreateRoomClose} onCreate={handleCreateRoom}></CreateRoomPopup>}
+      </div>
+      <div className='fixed flex justify-center items-center'> 
+        {showJoinRoomPopup && <JoinRoomPopup onClose={handleJoinRoomClose} onJoin={handleJoinRoom} code={inputCode}/>}
       </div>
     </div>
     <ToastContainer className='fixed top-2'></ToastContainer>

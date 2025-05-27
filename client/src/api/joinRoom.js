@@ -1,4 +1,8 @@
-export async function joinRoom ({code = "", username = "guest", password = ""}) {
+export async function joinRoom ({code = "", username = "", password = ""}) {
+  if (!code.trim()) {
+    throw new Error("Room code cannot be empty.");
+  }
+
   const res = await fetch(`/api/rooms/${code}/join`, 
   {
     method: "POST",

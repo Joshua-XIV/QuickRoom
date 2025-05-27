@@ -13,9 +13,12 @@ app.get('/api/rooms', (req, res) => {
     const safeRooms = {};
 
     for (const [code, room] of Object.entries(rooms)) {
-        safeRooms[code] = {
-            maxUsers: room.maxUsers,
-            isPrivate: room.isPrivate,
+        if (!room.isPrivate) {
+            safeRooms[code] = {
+                maxUsers: room.maxUsers,
+                hasPassword: room.hasPassword,
+                userLength: room.users.length,
+            }
         }
     }
 
@@ -24,6 +27,7 @@ app.get('/api/rooms', (req, res) => {
 
 app.post('/api/rooms', async (req, res) => {
     const { username, password, maxUsers = 10, isPrivate = false} = req.body;
+    let hasPassword = false;
     let hashedPassword = null;
     let code;
     let attempts = 0;
@@ -42,6 +46,7 @@ app.post('/api/rooms', async (req, res) => {
     }
 
     if (password) {
+        hasPassword = true;
         hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     }
 
@@ -57,6 +62,7 @@ app.post('/api/rooms', async (req, res) => {
         password: hashedPassword,
         maxUsers: parseInt(maxUsers),
         isPrivate,
+        hasPassword,
     };
 
     res.json({roomCode: code});
@@ -106,6 +112,28 @@ app.post('/api/rooms/:code/leave', (req, res) => {
     }
 
     res.json({message: `User ${username} left the room`})
+});
+
+app.post('/api/room/:code/check-password', async (req, res) => {
+    const { code } = req.params;
+    const { password = '' } = req.body;
+
+    const room = rooms[code];
+    if (!room) {
+        return res.status(404).json({ error: "Room Not Found" });
+    }
+
+    if (!room.password) {
+        // Room exists, but no password set — allow frontend to skip password prompt
+        return res.json({ success: false, reason: "No password required" });
+    }
+
+    const match = await bcrypt.compare(password, room.password);
+    if (!match) {
+        return res.json({ success: false, reason: "Incorrect password" });
+    }
+
+    return res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 5000;
