@@ -5,13 +5,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import {toast, ToastContainer} from 'react-toastify'
 import CreateRoomPopup from './CreateRoomPopup';
 import { useNavigate } from 'react-router-dom';
-import { joinRoom } from '../api/joinRoom';
 import JoinRoomPopup from './JoinRoomPopup';
+import { hasPassword } from '../api/hasPassword';
 
 const HomeSelection = () => {
   const[showCreateRoomPopup, setShowCreateRoomPopup] = useState(false);
   const[showJoinRoomPopup, setJoinRoomPopup] = useState(false);
   const[inputCode, setInputCode] = useState('');
+  const[showRequiredPassword, setShowRequiredPassword] = useState(false);
   
   const handleCreateRoomClick = (e) => {
     setShowCreateRoomPopup(true);
@@ -19,9 +20,26 @@ const HomeSelection = () => {
   const handleCreateRoomClose = (e) => {
     setShowCreateRoomPopup(false);
   }
-  const handleJoinRoomClick = (e) => {
-    setJoinRoomPopup(true)
-  }
+  const handleJoinRoomClick = async () => {
+    if (!inputCode || inputCode.trim().length === 0) {
+      toast.error("Please enter a room code.");
+      return;
+    }
+  
+    try {
+      const result = await hasPassword({ code: inputCode.trim() });
+      if (result.success) {
+        setJoinRoomPopup(true);
+        setShowRequiredPassword(result.hasPassword)
+      } else {
+        toast.error(result.reason || "Room not found.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+  
   const handleJoinRoomClose = (e) => {
     setJoinRoomPopup(false)
   }
@@ -38,21 +56,6 @@ const HomeSelection = () => {
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Failed to create room.");
-    }
-  };
-
-  const handleJoinRoom = async ({code, username, password}) => {
-    if (!inputCode) {
-      toast.error("Invalid Code");
-      return;
-    }
-    try {
-      const data = await joinRoom({code, username, password});
-      toast.success("Room Joined!")
-      navigate(`/room/${data.roomCode}`);
-    } catch (err) {
-      console.error(err);
-      toast.error(err.message || "Failed to join room.")
     }
   };
 
@@ -74,7 +77,7 @@ const HomeSelection = () => {
         {showCreateRoomPopup && <CreateRoomPopup onClose={handleCreateRoomClose} onCreate={handleCreateRoom}></CreateRoomPopup>}
       </div>
       <div className='fixed flex justify-center items-center'> 
-        {showJoinRoomPopup && <JoinRoomPopup onClose={handleJoinRoomClose} onJoin={handleJoinRoom} code={inputCode}/>}
+        {showJoinRoomPopup && <JoinRoomPopup onClose={handleJoinRoomClose} code={inputCode} hasPassword={showRequiredPassword}/>}
       </div>
     </div>
     <ToastContainer className='fixed top-2'></ToastContainer>

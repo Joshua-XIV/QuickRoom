@@ -5,6 +5,7 @@ const HomeButton = ({text, action}) => {
 
   return (
     <button 
+    type="button"
     name='create'
     className='border-2 border-amber-500 rounded-3xl w-xs p-4 cursor-pointer'
     style={{background: isHover ? "#f24ee5" : "#ffa74f",}}

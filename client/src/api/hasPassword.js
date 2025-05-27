@@ -1,16 +1,19 @@
-export async function hasPassword ({code, password}) {
-  const res = await fetch(`/api/room/${code}/check-password`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json" },
-    body: JSON.stringify({password})
-  });
+export async function hasPassword({ code }) {
+  try {
+    const res = await fetch(`/api/rooms/${code}/check-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
 
-  const result = await res.json();
+    const result = await res.json();
 
-  if (result.success || result.reason === "No password required") {
-    return {success:true}
-  }
-  else {
-    return {success:false, reason: result.reason || "Unknown Error"}
+    if (res.ok && result.success) {
+      return { success: true, hasPassword: result.hasPassword };
+    }else {
+      return { success: false, reason: result.reason || "Room does not exist" };
+    }
+  } catch (err) {
+    console.error("Error in hasPassword:", err);
+    return { success: false, reason: "Network error or invalid response" };
   }
 }

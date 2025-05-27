@@ -114,9 +114,8 @@ app.post('/api/rooms/:code/leave', (req, res) => {
     res.json({message: `User ${username} left the room`})
 });
 
-app.post('/api/room/:code/check-password', async (req, res) => {
+app.post('/api/rooms/:code/check-password', async (req, res) => {
     const { code } = req.params;
-    const { password = '' } = req.body;
 
     const room = rooms[code];
     if (!room) {
@@ -124,16 +123,10 @@ app.post('/api/room/:code/check-password', async (req, res) => {
     }
 
     if (!room.password) {
-        // Room exists, but no password set — allow frontend to skip password prompt
-        return res.json({ success: false, reason: "No password required" });
+        return res.json({ success: true, hasPassword: false});
     }
-
-    const match = await bcrypt.compare(password, room.password);
-    if (!match) {
-        return res.json({ success: false, reason: "Incorrect password" });
-    }
-
-    return res.json({ success: true });
+    
+    return res.json({ success: true, hasPassword: true});
 });
 
 const PORT = process.env.PORT || 5000;
