@@ -14,7 +14,6 @@ app.get('/api/rooms', (req, res) => {
 
     for (const [code, room] of Object.entries(rooms)) {
         safeRooms[code] = {
-            code,
             maxUsers: room.maxUsers,
             isPrivate: room.isPrivate,
         }
