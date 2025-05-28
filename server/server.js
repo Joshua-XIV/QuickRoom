@@ -129,7 +129,47 @@ app.post('/api/rooms/:code/check-password', async (req, res) => {
     return res.json({ success: true, hasPassword: true});
 });
 
-const PORT = process.env.PORT || 5000;
+app.get('/api/rooms/:code/users', (req, res) => {
+    const { code } = req.params;
+    const room = rooms[code];
+
+    if (!room) return res.status(404).json({ error: 'Room Not Found' });
+
+    res.json({ users: room.users });
+});
+
+const http = require('http');
+const { Server } = require('socket.io');
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+io.on('connection', (socket) => {
+    const roomCode = socket.handshake.query.roomCode;
+
+    if (roomCode) {
+        socket.join(roomCode);
+        console.log(`A user connected to room ${roomCode}`);
+
+        socket.on('chat-message', (msg) => {
+            // Broadcast message to everyone in the room
+            io.to(roomCode).emit('chat-message', msg);
+        });
+
+        socket.on('disconnect', () => {
+            console.log(`User disconnected from room ${roomCode}`);
+        });
+    } else {
+        console.log('User connected with no roomCode');
+    }
+});
+
+
 
 function generateRoomCode(length = 8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -156,6 +196,6 @@ function cancelRoomCleanup(code) {
     }
 }
 
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => { console.log(`Server started on port ${PORT}`)});
-
+server.listen(PORT, () => { console.log(`Server started on port ${PORT}`)});

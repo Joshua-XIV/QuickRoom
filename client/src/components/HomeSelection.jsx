@@ -44,21 +44,6 @@ const HomeSelection = () => {
     setJoinRoomPopup(false)
   }
 
-  const navigate = useNavigate();
-
-  const handleCreateRoom = async ({ username, password, maxUsers, isPrivate }) => {
-    try {
-      const data = await createRoom({ username, password, maxUsers, isPrivate });
-      toast.success("Room Created!");
-      setShowCreateRoomPopup(false);
-      navigate(`/room/${data.roomCode}`);
-
-    } catch (err) {
-      console.error(err);
-      toast.error(err.message || "Failed to create room.");
-    }
-  };
-
   return (
     <>
     <div className='flex justify-center items-center h-screen'>
@@ -74,7 +59,7 @@ const HomeSelection = () => {
         <HomeButton text="Browse Rooms"></HomeButton>
       </div>
       <div className='fixed flex justify-center items-center'>
-        {showCreateRoomPopup && <CreateRoomPopup onClose={handleCreateRoomClose} onCreate={handleCreateRoom}></CreateRoomPopup>}
+        {showCreateRoomPopup && <CreateRoomPopup onClose={handleCreateRoomClose}></CreateRoomPopup>}
       </div>
       <div className='fixed flex justify-center items-center'> 
         {showJoinRoomPopup && <JoinRoomPopup onClose={handleJoinRoomClose} code={inputCode} hasPassword={showRequiredPassword}/>}

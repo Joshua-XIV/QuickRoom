@@ -1,15 +1,31 @@
 import React, {useState } from 'react'
+import { createRoom } from '../api/createRoom'
+import {toast, ToastContainer} from 'react-toastify'
+import { useNavigate } from 'react-router-dom';
 
-const CreateRoomPopup = ({onCreate, onClose}) => {
+const CreateRoomPopup = ({onClose}) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [maxUsers, setMaxUsers] = useState(10)
   const [isPrivate, setPrivate] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
+
+  const handleCreateRoom = async ({ username, password, maxUsers, isPrivate }) => {
+    try {
+      const data = await createRoom({ username, password, maxUsers, isPrivate });
+      toast.success("Room Created!");
+      navigate(`/room/${data.roomCode}`, {state: {username}});
+
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to create room.");
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onCreate({username, password, maxUsers, isPrivate})
+    handleCreateRoom({username, password, maxUsers, isPrivate})
   };
 
   const inputStyle = "border-2 border-amber-500 focus:outline-none focus:border-blue-500 rounded-xl w-xs p-2"
@@ -20,8 +36,9 @@ const CreateRoomPopup = ({onCreate, onClose}) => {
       <form onSubmit={handleSubmit}  autoComplete="off" className='bg-white border-2 border-amber-500 rounded-3xl flex flex-col space-y-4 w-full h-full p-4'>
         
         <div className='flex items-center'>
-          <label htmlFor="username" className={labelStyle}>Username:</label>
+          <label htmlFor="usernameInput" className={labelStyle}>Username:</label>
           <input
+          id='usernameInput'
           name='username'
           placeholder='Enter Username'
           className={inputStyle}
@@ -31,8 +48,9 @@ const CreateRoomPopup = ({onCreate, onClose}) => {
         </div>
         
         <div className='flex items-center'>
-          <label htmlFor="password" className={labelStyle}>Password:</label>
+          <label htmlFor="passwordInput" className={labelStyle}>Password:</label>
           <input
+          id='passwordInput'
           name='password'
           type={showPassword ? "text" : "password"}
           placeholder='Enter Password (optional)'
@@ -40,18 +58,20 @@ const CreateRoomPopup = ({onCreate, onClose}) => {
           value={password}
           onChange={e => setPassword(e.target.value)}>
           </input>
-          <label htmlFor="showPassword" className={`${labelStyle} text-xs ml-4`}>Show Password</label>
+          <label htmlFor="showPasswordInput" className={`${labelStyle} text-xs ml-4`}>Show Password</label>
           <input
-            name='showPassword'
-            type='checkbox'
-            value={showPassword}
-            onChange={e => setShowPassword(e.target.checked)}>
+          id='showPasswordInput'
+          name='showPassword'
+          type='checkbox'
+          value={showPassword}
+          onChange={e => setShowPassword(e.target.checked)}>
           </input>
         </div>
 
         <div className='flex items-center'>
-          <label htmlFor="maxUsers" className={labelStyle}>Max Users:</label>
+          <label htmlFor="maxUsersInput" className={labelStyle}>Max Users:</label>
           <input
+          id='maxUsersInput'
           name="maxUsers"
           type="text"
           inputMode="numeric"
@@ -68,8 +88,9 @@ const CreateRoomPopup = ({onCreate, onClose}) => {
         </div>
 
         <div className='flex items-center'>
-          <label htmlFor="private" className={labelStyle}>Private:</label>
+          <label htmlFor="privateInput" className={labelStyle}>Private:</label>
           <input
+          id='privateInput'
           name='private'
           type='checkbox'
           checked={isPrivate}

@@ -19,7 +19,7 @@ const JoinRoomPopup = ({onClose, code, hasPassword}) => {
     try {
       const data = await joinRoom({code, username, password});
       toast.success("Room Joined!")
-      navigate(`/room/${data.roomCode}`);
+      navigate(`/room/${data.roomCode}`, {state: {username}});
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Failed to join room.")
