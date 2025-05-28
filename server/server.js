@@ -153,8 +153,7 @@ const io = new Server(server, {
 const socketUsers = new Map();
 
 io.on('connection', (socket) => {
-    const roomCode = socket.handshake.query.roomCode;
-    const username = socket.handshake.query.username;
+    const { roomCode, username } = socket.handshake.auth;
 
     if (roomCode && username) {
         socketUsers.set(socket.id, { username, roomCode });

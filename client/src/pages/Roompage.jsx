@@ -23,8 +23,9 @@ const Roompage = () => {
   }, [username, navigate]);
 
   useEffect(() => {
+    if (!username) return;
     const newSocket = io(SOCKET_URL, {
-      query: {roomCode: code, username: username}
+      auth: {roomCode: code, username: username}
     });
 
     setSocket(newSocket);
@@ -32,7 +33,7 @@ const Roompage = () => {
     return () => {
       newSocket.disconnect();
     };
-  }, [code]);
+  }, [code, username]);
 
   if (!username) return null;
 
