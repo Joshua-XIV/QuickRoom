@@ -149,20 +149,51 @@ const io = new Server(server, {
   },
 });
 
+const socketUsers = new Map();
+
 io.on('connection', (socket) => {
     const roomCode = socket.handshake.query.roomCode;
+    const username = socket.handshake.query.username;
 
-    if (roomCode) {
+    if (roomCode && username) {
+        socketUsers.set(socket.id, { username, roomCode });
         socket.join(roomCode);
-        console.log(`A user connected to room ${roomCode}`);
+        console.log(`${username} connected to room ${roomCode}`);
+
+        io.to(roomCode).emit('chat-message', {
+            system: true,
+            message: `${username} has joined the room`,
+            timestamp: Date.now()
+          });
 
         socket.on('chat-message', (msg) => {
-            // Broadcast message to everyone in the room
             io.to(roomCode).emit('chat-message', msg);
         });
 
         socket.on('disconnect', () => {
-            console.log(`User disconnected from room ${roomCode}`);
+            const userData = socketUsers.get(socket.id);
+            if (userData) {
+                const {username, roomCode} = userData;
+                const room = rooms[roomCode];
+                if (room) {
+                    room.users = room.users.filter(u => u !== username);
+
+                    io.to(roomCode).emit('chat-message', {
+                        system: true,
+                        message: `${username} has left the room`,
+                        timestamp: Date.now()
+                    });
+
+                    if (room.users.length === 0) {
+                        scheduleRoomCleanup(roomCode);
+                    }
+                }
+
+                socketUsers.delete(socket.id);
+                console.log(`User ${username} disconnected from room ${roomCode}`);
+            } else {
+                console.log(`Socket ${socket.id} disconnected`)
+            }
         });
     } else {
         console.log('User connected with no roomCode');
@@ -196,6 +227,6 @@ function cancelRoomCleanup(code) {
     }
 }
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5001;
 
 server.listen(PORT, () => { console.log(`Server started on port ${PORT}`)});

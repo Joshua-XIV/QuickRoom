@@ -23,7 +23,7 @@ const Roompage = () => {
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL, {
-      query: {roomCode: code}
+      query: {roomCode: code, username: username}
     });
 
     setSocket(newSocket);

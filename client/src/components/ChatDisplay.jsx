@@ -58,7 +58,7 @@ const ChatDisplay = ({socket, username, code}) => {
       <div ref={messagesContainerRef} className="flex-1 p-2 space-y-2 overflow-y-auto">
         {messages.map((msg, i) => (
           <div key={i} className="bg-gray-100 p-2 rounded shadow-sm">
-            <span className="font-semibold">{msg.username}:</span> {msg.message}
+            <span className="font-semibold">{msg.system ? "System" : msg.username}:</span> {msg.message}
             {msg.timestamp && (
               <div className="text-xs text-gray-500 mt-1">
                 {new Date(msg.timestamp).toLocaleTimeString()}
