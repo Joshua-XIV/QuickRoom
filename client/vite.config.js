@@ -13,6 +13,7 @@ export default defineConfig({
     proxy: {
       '/api' : process.env.VITE_BACKEND_URL || 'http://localhost:5001',
     },
+    host: true,
     port: 3002,
   },
 })

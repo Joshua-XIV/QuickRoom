@@ -52,6 +52,12 @@ const ChatDisplay = ({socket, username, code}) => {
     }
   }, [messages, autoScroll]);
 
+  useEffect(() => {
+    if (!socket || !username || !code) return;
+  
+    socket.emit('rejoin-room', { username, code });
+  }, [socket, username, code]);
+
   return (
     <div className="flex flex-col bg-white h-full">
       <p className='text-center text-xl bg-amber-500 border-b'>Code: {code}</p>

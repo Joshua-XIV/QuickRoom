@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate} from 'react-router-dom';
 import SideDisplay from '../components/SideDisplay';
 import {io} from 'socket.io-client'
+import GridDisplay from '../components/GridDisplay';
 
 const SOCKET_URL = import.meta.env.VITE_BACKEND_URL
 

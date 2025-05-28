@@ -95,6 +95,7 @@ app.post('/api/rooms/:code/join', async (req, res) => {
         cancelRoomCleanup(code);
 
     room.users.push(trimmed);
+    io.to(code).emit('update-users', room.users);
     res.json({message: `User ${username} joined the room`, roomCode: code})
 });
 
@@ -170,6 +171,20 @@ io.on('connection', (socket) => {
             io.to(roomCode).emit('chat-message', msg);
         });
 
+        socket.on('rejoin-room', ({ username, code }) => {
+            const room = rooms[code];
+            if (!room) return;
+            
+            if (!room.users.includes(username)) {
+                room.users.push(username);
+            }
+            
+            socket.join(code);
+            socketUsers.set(socket.id, { username, roomCode: code });
+            
+            io.to(code).emit('update-users', room.users);
+        });
+
         socket.on('disconnect', () => {
             const userData = socketUsers.get(socket.id);
             if (userData) {
@@ -183,12 +198,11 @@ io.on('connection', (socket) => {
                         message: `${username} has left the room`,
                         timestamp: Date.now()
                     });
-
+                    io.to(roomCode).emit('update-users', room.users);
                     if (room.users.length === 0) {
                         scheduleRoomCleanup(roomCode);
                     }
                 }
-
                 socketUsers.delete(socket.id);
                 console.log(`User ${username} disconnected from room ${roomCode}`);
             } else {
@@ -229,4 +243,5 @@ function cancelRoomCleanup(code) {
 
 const PORT = 5001;
 
-server.listen(PORT, () => { console.log(`Server started on port ${PORT}`)});
+//server.listen(PORT, () => { console.log(`Server started on port ${PORT}`)});
+server.listen(PORT, "0.0.0.0");
