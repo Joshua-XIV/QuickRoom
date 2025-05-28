@@ -2,7 +2,7 @@ import {Resizable} from 're-resizable'
 import ChatDisplay from './ChatDisplay'
 import GridDisplay from './GridDisplay'
 
-const SideDisplay = ({code, socket, username}) => {
+const RoomDisplay = ({code, socket, username}) => {
   return (
     <div className='flex'>
       <Resizable
@@ -19,4 +19,4 @@ const SideDisplay = ({code, socket, username}) => {
   )
 }
 
-export default SideDisplay
+export default RoomDisplay

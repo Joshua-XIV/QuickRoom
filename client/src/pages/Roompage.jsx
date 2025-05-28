@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate} from 'react-router-dom';
-import SideDisplay from '../components/SideDisplay';
+import SideDisplay from '../components/RoomDisplay';
 import {io} from 'socket.io-client'
 import GridDisplay from '../components/GridDisplay';
 
