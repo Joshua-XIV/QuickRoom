@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate} from 'react-router-dom';
-import SideDisplay from '../components/RoomDisplay';
+import RoomDisplay from '../components/RoomDisplay';
 import {io} from 'socket.io-client'
-import GridDisplay from '../components/GridDisplay';
 
 const SOCKET_URL = 'http://localhost:5001'
 
@@ -40,7 +39,7 @@ const Roompage = () => {
 
   return (
     <>
-      <SideDisplay code={code} socket={socket} username={username}/>
+      <RoomDisplay code={code} socket={socket} username={username}/>
     </>
   )
 }

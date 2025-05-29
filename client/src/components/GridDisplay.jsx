@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+// Should do a lot of this logic with local media devices outside the room probably for future projects
+
 const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
 ];
@@ -8,7 +10,7 @@ const ICE_SERVERS = [
 const ASPECT_RATIO = 16 / 9;
 const PADDING_BOTTOM = `${100 / ASPECT_RATIO}%`;
 
-const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => {
+const GridDisplay = ({ socket, videoEnabled, audioEnabled, username }) => {
   const [users, setUsers] = useState([]);
   const [stream, setStream] = useState(null);
   const videoRefs = useRef({});
@@ -47,30 +49,16 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
   useEffect(() => {
     const startStream = async () => {
       try {
-        // Stop existing stream if disabling both video and audio
-        if (!videoEnabled && !audioEnabled) {
-          if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            setStream(null);
-          }
-          // Notify others that your media is off
-          if (socket) {
-            socket.emit('media-state', {
-              username,
-              videoEnabled: false,
-              audioEnabled: false,
-            });
-          }
-          return;
-        }
-
         const mediaConstraints = {};
-        if (videoEnabled) mediaConstraints.video = true; else mediaConstraints.video = false;
-        if (audioEnabled) mediaConstraints.audio = true;
-
+        mediaConstraints.video = videoEnabled;
+        mediaConstraints.audio = audioEnabled;
+        let media = null;
         console.log("Requesting media with:", mediaConstraints);
-        const media = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-        console.log("Got tracks:", media.getTracks());
+        // only get user media if one of them is enabled
+        if (videoEnabled || audioEnabled) {
+          media = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+          console.log("Got tracks:", media.getTracks());
+        }
 
         setStream(media);
         if (videoRefs.current['self']) {
@@ -83,6 +71,47 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
             videoEnabled,
             audioEnabled,
           });
+        }
+
+        if (!videoEnabled) {
+          if (stream) {
+            stream.getVideoTracks().forEach(track => track.stop());
+          }
+          // Notify others that your media is off
+          if (socket) {
+            socket.emit('media-state', {
+              username,
+              videoEnabled: false,
+              audioEnabled: audioEnabled,
+            });
+          }
+        }
+
+        if (!audioEnabled) {
+          if (stream) {
+            stream.getAudioTracks().forEach(track => track.stop());
+          }
+          // Notify others that your media is off
+          if (socket) {
+            socket.emit('media-state', {
+              username,
+              videoEnabled: videoEnabled,
+              audioEnabled: false,
+            });
+          }
+        }
+
+        if (!videoEnabled && !audioEnabled) {
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+          }
+          if (socket) {
+            socket.emit('media-state', {
+              username,
+              videoEnabled: false,
+              audioEnabled: false,
+            });
+          }
         }
 
       } catch (err) {
@@ -162,7 +191,7 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
       }
     });
 
-    // Update peer connections with latest local tracks
+    // Attempt to update peer connections with latest local tracks
     if (stream) {
       Object.values(peerConnections.current).forEach(pc => {
         const currentTracks = stream.getTracks();
@@ -314,6 +343,29 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
       socket.off('ice-candidate', handleIceCandidate);
     };
   }, [socket, stream]);
+
+  const streamRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      console.log('GridDisplay mount/unmount?');
+      console.log(streamRef.current); // should be null at first
+      if (streamRef.current) {
+        console.log('Hello');  // should be logging when inside
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      // Also close all peer connections
+      Object.values(peerConnections.current).forEach(pc => pc.close());
+      peerConnections.current = {};
+      remoteStreams.current = {};
+      videoRefs.current = {};
+    };
+  }, []);
+
+  useEffect(() => {
+    streamRef.current = stream;
+  }, [stream]);
 
   return (
     <div 
