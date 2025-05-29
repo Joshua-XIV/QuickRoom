@@ -209,6 +209,14 @@ io.on('connection', (socket) => {
             }
         });
 
+        socket.on('media-state', ({ username, videoEnabled, audioEnabled }) => {
+            socket.to(roomCode).emit('media-state', {
+                username,
+                videoEnabled,
+                audioEnabled,
+            });
+        });
+
         // Rejoin room (optional if your client wants to handle reconnection)
         socket.on('rejoin-room', ({ username, code }) => {
             const room = rooms[code];

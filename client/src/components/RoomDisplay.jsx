@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 const RoomDisplay = ({code, socket, username}) => {
   const [videoEnabled, setVideoEnabled] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
 
   const toggleVideo = () => setVideoEnabled(prev => !prev);
   const toggleAudio = () => setAudioEnabled(prev => !prev);
