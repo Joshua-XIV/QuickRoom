@@ -183,7 +183,7 @@ io.on('connection', (socket) => {
             
             io.to(code).emit('update-users', room.users);
         });
-
+        
         socket.on('disconnect', () => {
             const userData = socketUsers.get(socket.id);
             if (userData) {
@@ -212,8 +212,6 @@ io.on('connection', (socket) => {
         console.log('User connected with no roomCode');
     }
 });
-
-
 
 function generateRoomCode(length = 8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'

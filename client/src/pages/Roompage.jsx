@@ -23,15 +23,16 @@ const Roompage = () => {
   }, [username, navigate]);
 
   useEffect(() => {
-    if (!username) return;
-    const newSocket = io(SOCKET_URL, {
-      auth: {roomCode: code, username: username}
-    });
-
-    setSocket(newSocket);
-
+    let newSocket;
+    if (username) {
+      newSocket = io(SOCKET_URL, {
+        auth: { roomCode: code, username }
+      });
+      setSocket(newSocket);
+    }
+  
     return () => {
-      newSocket.disconnect();
+      if (newSocket) newSocket.disconnect();
     };
   }, [code, username]);
 
