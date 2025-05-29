@@ -4,7 +4,7 @@ import SideDisplay from '../components/RoomDisplay';
 import {io} from 'socket.io-client'
 import GridDisplay from '../components/GridDisplay';
 
-const SOCKET_URL = import.meta.env.VITE_BACKEND_URL
+const SOCKET_URL = 'http://localhost:5001'
 
 const Roompage = () => {
   const {code} = useParams();

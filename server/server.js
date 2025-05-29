@@ -150,7 +150,16 @@ const io = new Server(server, {
   },
 });
 
+// Map socket.id => {username, roomCode}
 const socketUsers = new Map();
+
+// Helper to find socket by username in a room
+function findSocketIdByUsername(roomCode, username) {
+  for (const [id, user] of socketUsers.entries()) {
+    if (user.roomCode === roomCode && user.username === username) return id;
+  }
+  return null;
+}
 
 io.on('connection', (socket) => {
     const { roomCode, username } = socket.handshake.auth;
@@ -160,30 +169,61 @@ io.on('connection', (socket) => {
         socket.join(roomCode);
         console.log(`${username} connected to room ${roomCode}`);
 
+        // Notify all in room
         io.to(roomCode).emit('chat-message', {
             system: true,
             message: `${username} has joined the room`,
             timestamp: Date.now()
-          });
+        });
 
+        // Send updated users list to clients for video grid
+        const room = rooms[roomCode];
+        if (room) {
+            io.to(roomCode).emit('update-users', room.users);
+        }
+
+        // Chat message relay
         socket.on('chat-message', (msg) => {
             io.to(roomCode).emit('chat-message', msg);
         });
 
+        // WebRTC Signaling events
+        socket.on('offer', ({ toUsername, offer }) => {
+            const targetSocketId = findSocketIdByUsername(roomCode, toUsername);
+            if (targetSocketId) {
+                io.to(targetSocketId).emit('offer', { fromUsername: username, offer });
+            }
+        });
+
+        socket.on('answer', ({ toUsername, answer }) => {
+            const targetSocketId = findSocketIdByUsername(roomCode, toUsername);
+            if (targetSocketId) {
+                io.to(targetSocketId).emit('answer', { fromUsername: username, answer });
+            }
+        });
+
+        socket.on('ice-candidate', ({ toUsername, candidate }) => {
+            const targetSocketId = findSocketIdByUsername(roomCode, toUsername);
+            if (targetSocketId) {
+                io.to(targetSocketId).emit('ice-candidate', { fromUsername: username, candidate });
+            }
+        });
+
+        // Rejoin room (optional if your client wants to handle reconnection)
         socket.on('rejoin-room', ({ username, code }) => {
             const room = rooms[code];
             if (!room) return;
-            
+
             if (!room.users.includes(username)) {
                 room.users.push(username);
             }
-            
+
             socket.join(code);
             socketUsers.set(socket.id, { username, roomCode: code });
-            
             io.to(code).emit('update-users', room.users);
         });
-        
+
+        // Handle disconnect
         socket.on('disconnect', () => {
             const userData = socketUsers.get(socket.id);
             if (userData) {
@@ -198,6 +238,7 @@ io.on('connection', (socket) => {
                         timestamp: Date.now()
                     });
                     io.to(roomCode).emit('update-users', room.users);
+
                     if (room.users.length === 0) {
                         scheduleRoomCleanup(roomCode);
                     }
@@ -209,7 +250,7 @@ io.on('connection', (socket) => {
             }
         });
     } else {
-        console.log('User connected with no roomCode');
+        console.log('User connected with no roomCode or username');
     }
 });
 

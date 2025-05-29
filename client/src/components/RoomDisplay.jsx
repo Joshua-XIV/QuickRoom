@@ -29,7 +29,7 @@ const RoomDisplay = ({code, socket, username}) => {
       className='bg-amber-500 border-2'>
         <ChatDisplay socket={socket} username={username} code={code}/>
       </Resizable>
-      <GridDisplay socket={socket} code={code} videoEnabled={videoEnabled} audioEnabled={audioEnabled}/>
+      <GridDisplay socket={socket} code={code} username={username} videoEnabled={videoEnabled} audioEnabled={audioEnabled}/>
     </div>
   )
 }
