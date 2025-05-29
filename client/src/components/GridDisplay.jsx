@@ -4,6 +4,10 @@ const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
 ];
 
+// Aspect ratio constants (16:9)? Maybe works
+const ASPECT_RATIO = 16 / 9;
+const PADDING_BOTTOM = `${100 / ASPECT_RATIO}%`;
+
 const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => {
   const [users, setUsers] = useState([]);
   const [stream, setStream] = useState(null);
@@ -12,6 +16,33 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
   const remoteStreams = useRef({});
   const pendingCandidates = useRef({});
   const [userStates, setUserStates] = useState({});
+  const [gridCols, setGridCols] = useState(2);
+  const gridContainerRef = useRef(null);
+
+  // Attempt to calculate grid columns based on container width and number of users
+  useEffect(() => {
+    const updateGridLayout = () => {
+      if (!gridContainerRef.current) return;
+      
+      const containerWidth = gridContainerRef.current.offsetWidth;
+      const minTileWidth = 300;
+      const numUsers = Math.max(1, users.length);
+      
+      const maxCols = Math.max(1, Math.floor(containerWidth / minTileWidth));
+      const balancedCols = Math.ceil(Math.sqrt(numUsers));
+      
+      const cols = Math.min(maxCols, balancedCols);
+      
+      setGridCols(cols);
+    };
+
+    updateGridLayout();
+    window.addEventListener('resize', updateGridLayout);
+    
+    return () => {
+      window.removeEventListener('resize', updateGridLayout);
+    };
+  }, [users.length]);
 
   useEffect(() => {
     const startStream = async () => {
@@ -34,7 +65,7 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
         }
 
         const mediaConstraints = {};
-        if (videoEnabled) mediaConstraints.video = true; else mediaConstraints.video = false
+        if (videoEnabled) mediaConstraints.video = true; else mediaConstraints.video = false;
         if (audioEnabled) mediaConstraints.audio = true;
 
         console.log("Requesting media with:", mediaConstraints);
@@ -131,7 +162,7 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
       }
     });
 
-    // Update peer connections with latest local tracks (if any)
+    // Update peer connections with latest local tracks
     if (stream) {
       Object.values(peerConnections.current).forEach(pc => {
         const currentTracks = stream.getTracks();
@@ -285,54 +316,77 @@ const GridDisplay = ({ socket, code, videoEnabled, audioEnabled, username }) => 
   }, [socket, stream]);
 
   return (
-    <div className="w-full h-full bg-black/85 border-2 border-amber-500 p-4 grid grid-cols-2 gap-4 overflow-y-auto">
-      <div className="bg-white p-2 rounded-2xl text-center shadow-xl">
-        {videoEnabled ? (
-          <video
-            ref={el => videoRefs.current['self'] = el}
-            autoPlay
-            muted
-            playsInline
-            className="w-full h-auto"
-          />
-        ) : (
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">Video Off</span>
+    <div 
+      ref={gridContainerRef}
+      className="w-full h-screen bg-black/85 border-2 border-amber-500 p-4 overflow-y-auto"
+    >
+      <div 
+        className="grid gap-4 w-full h-full"
+        style={{
+          gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
+          gridAutoRows: '1fr',
+        }}
+      >
+        {/* Self video */}
+        <div className="bg-white p-2 rounded-2xl text-center shadow-xl flex flex-col">
+          <div className="relative" style={{ paddingBottom: PADDING_BOTTOM }}>
+            {videoEnabled ? (
+              <video
+                ref={el => videoRefs.current['self'] = el}
+                autoPlay
+                muted
+                playsInline
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute top-0 left-0 w-full h-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">Video Off</span>
+              </div>
+            )}
           </div>
-        )}
-        <div>{username} (You)</div>
-        <div className="text-sm text-gray-600">
-          {videoEnabled ? 'Video: On' : 'Video: Off'} | {audioEnabled ? 'Audio: On' : 'Audio: Off'}
-        </div>
-      </div>
-
-      {users.filter(u => u !== username).map(user => (
-        <div key={user} className="bg-white p-2 rounded-2xl text-center shadow-xl">
-          <video
-            ref={el => {
-              if (el) {
-                videoRefs.current[user] = el;
-                if (remoteStreams.current[user]) {
-                  el.srcObject = remoteStreams.current[user];
-                }
-              }
-            }}
-            autoPlay
-            playsInline
-            className="w-full h-auto"
-            style={{ backgroundColor: userStates[user]?.hasVideo ? 'transparent' : 'black' }}
-          />
-          <div>{user}</div>
+          <div className="mt-2 font-medium">{username} (You)</div>
           <div className="text-sm text-gray-600">
-            {userStates[user]?.hasVideo !== undefined 
-              ? (userStates[user]?.hasVideo ? 'Video: On' : 'Video: Off')
-              : 'Loading...'} | 
-            {userStates[user]?.hasAudio !== undefined
-              ? (userStates[user]?.hasAudio ? ' Audio: On' : ' Audio: Off')
-              : 'Loading...'}
+            {videoEnabled ? 'Video: On' : 'Video: Off'} | {audioEnabled ? 'Audio: On' : 'Audio: Off'}
           </div>
         </div>
-      ))}
+
+        {/* Other users */}
+        {users.filter(u => u !== username).map(user => (
+          <div key={user} className="bg-white p-2 rounded-2xl text-center shadow-xl flex flex-col">
+            <div className="relative" style={{ paddingBottom: PADDING_BOTTOM }}>
+              <video
+                ref={el => {
+                  if (el) {
+                    videoRefs.current[user] = el;
+                    if (remoteStreams.current[user]) {
+                      el.srcObject = remoteStreams.current[user];
+                    }
+                  }
+                }}
+                autoPlay
+                playsInline
+                className={`absolute top-0 left-0 w-full h-full ${
+                  userStates[user]?.hasVideo ? 'object-cover' : 'bg-gray-200'
+                }`}
+              />
+              {!userStates[user]?.hasVideo && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-gray-500">Video Off</span>
+                </div>
+              )}
+            </div>
+            <div className="mt-2 font-medium">{user}</div>
+            <div className="text-sm text-gray-600">
+              {userStates[user]?.hasVideo !== undefined 
+                ? (userStates[user]?.hasVideo ? 'Video: On' : 'Video: Off')
+                : 'Loading...'} | 
+              {userStates[user]?.hasAudio !== undefined
+                ? (userStates[user]?.hasAudio ? ' Audio: On' : ' Audio: Off')
+                : 'Loading...'}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

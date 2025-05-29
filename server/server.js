@@ -217,7 +217,7 @@ io.on('connection', (socket) => {
             });
         });
 
-        // Rejoin room (optional if your client wants to handle reconnection)
+        // Rejoin room
         socket.on('rejoin-room', ({ username, code }) => {
             const room = rooms[code];
             if (!room) return;
