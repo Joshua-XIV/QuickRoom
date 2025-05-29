@@ -12,11 +12,11 @@ const RoomDisplay = ({code, socket, username}) => {
 
   return (
     <div className='flex'>
-      <div className='fixed p-2 z-10 bottom-2 left-1/2 bg-amber-500 gap-2 space-x-4'>
-        <button onClick={toggleVideo} className='px-4 py-2 bg-black text-white rounded-xl'>
+      <div className='fixed p-2 z-10 bottom-4 left-1/2 bg-amber-500 gap-2 space-x-4 rounded-3xl'>
+        <button onClick={toggleVideo} className='px-4 py-2 bg-black text-white rounded-3xl cursor-pointer'>
           {videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
         </button>
-        <button onClick={toggleAudio} className='px-4 py-2 bg-black text-white rounded-xl'>
+        <button onClick={toggleAudio} className='px-4 py-2 bg-black text-white rounded-3xl cursor-pointer'>
           {audioEnabled ? "Mute Mic" : "Unmute Mic"}
         </button>
       </div>

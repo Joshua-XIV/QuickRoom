@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// Should do a lot of this logic with local media devices outside the room probably for future projects
+// Should do a lot of this logic with local media devices outside the room probably for future
 
 const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
