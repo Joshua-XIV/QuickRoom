@@ -6,7 +6,7 @@ app.use(express.json());
 require('dotenv').config();
 
 const corsOptions = {
-    origin: 'https://quickroom.netlify.app',  // your frontend domain
+    origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
   };
@@ -154,7 +154,7 @@ const { Server } = require('socket.io');
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://quickroom.netlify.app',
+    origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST'],
   },
 });
