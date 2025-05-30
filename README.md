@@ -4,12 +4,14 @@ This is a personal project focused on learning and integrating WebSockets, as we
 
 
 Current Features:  
+
 Create a room for up to 20 users  
 Text Chat, Audio, and Video  
 Can set passwords for your rooms  
 Can set your room to be private to avoid being on the Browse list
 
 Known Bugs: 
+
 Sometimes have to re-join rooms to see video
 
 https://quickroom.netlify.app/
