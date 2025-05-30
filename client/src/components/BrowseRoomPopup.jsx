@@ -9,7 +9,7 @@ const BrowseRoomPopup = ({onClose}) => {
   const [grabHasPassword, setGrabHasPassword] = useState(false)
   const [refresh, setRefresh] = useState(false)
   const [showJoinRoomPopup, setShowJoinRoomPop] = useState(false)
-  const browserContainerRef = useRef(null)
+  const [sortByUsers, setSortByUsers] = useState(null);
 
   useEffect(() => {
     const handleEsc = (event) => {
@@ -37,10 +37,12 @@ const BrowseRoomPopup = ({onClose}) => {
   useEffect(() => {
     const fetchRooms = async () => {
       const rooms = await handleGetRooms();
-      if (rooms) setData(rooms);
+      if (rooms) {
+        setData(rooms);
+      }
     };
     fetchRooms();
-  }, [])
+  }, [refresh])
 
   const handleJoinRoomClick = (e) => {
     setShowJoinRoomPop(true)
@@ -57,12 +59,29 @@ const BrowseRoomPopup = ({onClose}) => {
         <div className='w-full bg-gray-400 flex justify-between border-2 p-2'>
           <p className='ml-6'>Room</p>
           <div className='flex space-x-6'>
-            <p>Users</p>
+            <p 
+            className='underline cursor-pointer'
+            onClick={() => {setSortByUsers((prev) => {
+              if (prev === null) return 'asc';
+              if (prev === 'asc') return 'desc';
+              return null;
+              });
+            }}>
+              Users
+              {sortByUsers === 'asc' && <span>↑</span>}
+              {sortByUsers === 'desc' && <span>↓</span>}
+            </p>
             <p>Password</p>
           </div>
         </div>
         <div className='flex-grow overflow-y-auto'>
-          {Object.entries(data).map(([code, room]) => {
+          {Object.entries(data)
+          .sort(([, a], [, b]) => {
+            if (sortByUsers === 'asc') return a.userLength - b.userLength;
+            if (sortByUsers === 'desc') return b.userLength - a.userLength;
+            if (sortByUsers === null) return 
+          })
+          .map(([code, room]) =>  {
             const isSelected = grabCode === code
             return (
               <button className={`w-full ${isSelected ? "bg-amber-500" : "hover:bg-amber-200"}`} onClick={() => {setGrabCode(code); setGrabHasPassword(room.hasPassword)}} key={code}>
@@ -78,8 +97,11 @@ const BrowseRoomPopup = ({onClose}) => {
           })}
         </div>
         <div className="flex justify-between border-2 p-2 space-x-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 border rounded cursor-pointer">Cancel</button>
-          <button onClick={handleJoinRoomClick} className="px-4 py-2 bg-amber-500 text-white rounded cursor-pointer disabled:bg-amber-500/50" disabled={!grabCode}>Join</button>
+          <button type="button" onClick={onClose} className="px-4 py-2 border-2 bg-red-400 rounded cursor-pointer w-24 hover:bg-red-700">Cancel</button>
+          <div className='space-x-12'>
+            <button onClick={() => setRefresh(!refresh)} className='px-4 py-2 border-2 w-24 rounded bg-blue-500 cursor-pointer hover:bg-blue-700'>Refresh</button>
+            <button onClick={handleJoinRoomClick} className="px-4 py-2 w-24 bg-amber-500 border-2 text-black rounded cursor-pointer disabled:bg-amber-500/50 hover:bg-amber-600" disabled={!grabCode}>Join</button>
+          </div>
         </div>
       </div>
       {showJoinRoomPopup && (

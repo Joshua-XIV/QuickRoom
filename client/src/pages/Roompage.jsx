@@ -3,7 +3,7 @@ import { useParams, useLocation, useNavigate} from 'react-router-dom';
 import RoomDisplay from '../components/RoomDisplay';
 import {io} from 'socket.io-client'
 
-const SOCKET_URL = 'http://localhost:5001'
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL
 
 const Roompage = () => {
   const {code} = useParams();

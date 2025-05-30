@@ -1,10 +1,8 @@
 import React, { useState } from 'react'
 import HomeButton from './HomeButton'
-import { createRoom } from '../api/createRoom';
 import 'react-toastify/dist/ReactToastify.css';
 import {toast, ToastContainer} from 'react-toastify'
 import CreateRoomPopup from './CreateRoomPopup';
-import { useNavigate } from 'react-router-dom';
 import JoinRoomPopup from './JoinRoomPopup';
 import { hasPassword } from '../api/hasPassword';
 import BrowseRoomPopup from './BrowseRoomPopup';

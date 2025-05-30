@@ -288,6 +288,4 @@ function cancelRoomCleanup(code) {
 }
 
 const PORT = 5001;
-
-//server.listen(PORT, () => { console.log(`Server started on port ${PORT}`)});
 server.listen(PORT, "0.0.0.0");
