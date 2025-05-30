@@ -5,14 +5,16 @@ const HomeBackGround = () => {
   const [isVisible, setVisible] = useState(false)
 
   useEffect(() => { 
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setVisible(true)
     }, 100);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
-    <div className={`-z-10 fixed w-screen h-screen overflow-hidden transition-opacity duration-3000 ease-in-out ${isVisible ? "opacity-100" : "opacity-40"}`}>
-      <img src={HomeImage}></img>
+    <div className={`-z-10 fixed w-full h-screen transition-opacity duration-2000 ease-in-out ${isVisible ? "opacity-100" : "opacity-40"}`}>
+      <img src={HomeImage} className='object-cover w-full h-full'></img>
     </div>
   )
 }

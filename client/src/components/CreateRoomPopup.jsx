@@ -1,4 +1,4 @@
-import React, {useState } from 'react'
+import React, {useEffect, useState } from 'react'
 import { createRoom } from '../api/createRoom'
 import {toast, ToastContainer} from 'react-toastify'
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,20 @@ const CreateRoomPopup = ({onClose}) => {
     e.preventDefault()
     handleCreateRoom({username, password, maxUsers, isPrivate})
   };
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+
+    return () => {
+      window.removeEventListener('keydown', handleEsc)
+    }
+  }, [onClose]);
 
   const inputStyle = "border-2 border-amber-500 focus:outline-none focus:border-blue-500 rounded-xl w-xs p-2"
   const labelStyle = "w-24"
@@ -69,7 +83,10 @@ const CreateRoomPopup = ({onClose}) => {
         </div>
 
         <div className='flex items-center'>
-          <label htmlFor="maxUsersInput" className={labelStyle}>Max Users:</label>
+          <div className='flex flex-col'>
+            <label htmlFor="maxUsersInput" className={labelStyle}>Max Users:</label>
+            <p className='text-sm text-center pr-4'>(2-20)</p>
+          </div>
           <input
           id='maxUsersInput'
           name="maxUsers"

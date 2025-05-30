@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { joinRoom } from '../api/joinRoom';
 import {toast, ToastContainer} from 'react-toastify'
@@ -25,6 +25,19 @@ const JoinRoomPopup = ({onClose, code, hasPassword}) => {
       toast.error(err.message || "Failed to join room.")
     }
   };
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key == "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener('keydown', handleEsc)
+    return () => {
+      window.removeEventListener('keydown', handleEsc)
+    }
+  }, [onClose]);
 
   const inputStyle = "border-2 border-amber-500 focus:outline-none focus:border-blue-500 rounded-xl w-xs p-2"
   const labelStyle = "w-24"
