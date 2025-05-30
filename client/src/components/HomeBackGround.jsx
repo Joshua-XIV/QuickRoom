@@ -13,7 +13,7 @@ const HomeBackGround = () => {
   }, []);
 
   return (
-    <div className={`-z-10 fixed w-full h-screen transition-opacity duration-2000 ease-in-out ${isVisible ? "opacity-100" : "opacity-40"}`}>
+    <div className={`-z-10 fixed w-full h-screen transition-opacity duration-2000 ease-in-out ${isVisible ? "opacity-100" : "opacity-80"}`}>
       <img src={HomeImage} className='object-cover w-full h-full'></img>
     </div>
   )

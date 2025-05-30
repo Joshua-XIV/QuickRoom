@@ -4,8 +4,6 @@ import { joinRoom } from '../../api/joinRoom';
 import {toast, ToastContainer} from 'react-toastify'
 import Spinner from './Spinner'
 
-
-
 const JoinRoomPopup = ({onClose, code, hasPassword}) => {
   const [isLoading, setIsLoading] = useState(false)
   const [username, setUsername] = useState('')

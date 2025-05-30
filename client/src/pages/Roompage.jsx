@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate} from 'react-router-dom';
 import RoomDisplay from '../components/RoomDisplay';
 import {io} from 'socket.io-client'
+import { hasPassword } from '../../api/hasPassword';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL
 
@@ -12,14 +13,26 @@ const Roompage = () => {
   const navigate = useNavigate();
   const { username } = location.state || {};
 
-
   useEffect(() => {
+    let called = false;
     if (!username) {
-      // Redirect back to home if username is missing
-      navigate('/');
-      return;
+      (async () => {
+        const res = await hasPassword({ code });
+        if (!res.success) {
+          // Room doesn't exist or network error, redirect to home
+          if (called) alert("Room doesn't Exist");
+          navigate('/', { replace: true });
+        } else {
+          // Room exists, redirect to join page
+          navigate(`/room/${code}/join`, { replace: true });
+        }
+      })();
     }
-  }, [username, navigate]);
+
+    return () => {
+      called = true;
+    }
+  }, [username, code, navigate]);
 
   useEffect(() => {
     let newSocket;
