@@ -1,6 +1,6 @@
 # QuickRoom
 
-Personal Project of mine.
+This is a personal project focused on learning and integrating WebSockets, as well as deploying both the backend and frontend to the web. The UI is intentionally simple, as the primary goal was to gain hands-on experience with real-time communication and full-stack deployment.
 
 
 Current Features:
