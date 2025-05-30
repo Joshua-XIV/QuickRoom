@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { joinRoom } from '../api/joinRoom';
+import { joinRoom } from '../../api/joinRoom';
 import {toast, ToastContainer} from 'react-toastify'
 
 

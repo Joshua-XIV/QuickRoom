@@ -1,5 +1,5 @@
 import React, {useEffect, useState } from 'react'
-import { createRoom } from '../api/createRoom'
+import { createRoom } from '../../api/createRoom'
 import {toast, ToastContainer} from 'react-toastify'
 import { useNavigate } from 'react-router-dom';
 

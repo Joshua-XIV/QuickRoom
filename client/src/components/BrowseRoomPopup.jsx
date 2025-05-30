@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { getRooms } from '../api/getRooms';
+import { getRooms } from '../../api/getRooms';
 import {toast} from 'react-toastify'
 import JoinRoomPopup from './JoinRoomPopup';
 

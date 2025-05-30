@@ -1,6 +1,8 @@
+const BASE_API_URL = import.meta.env.VITE_API_BASE_URL;
+
 export async function hasPassword({ code }) {
   try {
-    const res = await fetch(`/api/rooms/${code}/check-password`, {
+    const res = await fetch(`${BASE_API_URL}/rooms/${code}/check-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });

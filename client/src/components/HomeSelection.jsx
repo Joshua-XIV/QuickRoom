@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {toast, ToastContainer} from 'react-toastify'
 import CreateRoomPopup from './CreateRoomPopup';
 import JoinRoomPopup from './JoinRoomPopup';
-import { hasPassword } from '../api/hasPassword';
+import { hasPassword } from '../../api/hasPassword';
 import BrowseRoomPopup from './BrowseRoomPopup';
 
 const HomeSelection = () => {

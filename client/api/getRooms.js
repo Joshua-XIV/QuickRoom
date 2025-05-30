@@ -1,5 +1,7 @@
+const BASE_API_URL = import.meta.env.VITE_API_BASE_URL;
+
 export async function getRooms () {
-  const res = await fetch('/api/rooms', 
+  const res = await fetch(`${BASE_API_URL}/rooms`, 
   {
     method: 'GET',
     headers: {'Content-Type' : 'application/json'},
