@@ -6,6 +6,7 @@ import {toast, ToastContainer} from 'react-toastify'
 
 
 const JoinRoomPopup = ({onClose, code, hasPassword}) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -16,6 +17,7 @@ const JoinRoomPopup = ({onClose, code, hasPassword}) => {
       toast.error("Invalid Code");
       return;
     }
+    setIsLoading(true)
     try {
       const data = await joinRoom({code, username, password});
       toast.success("Room Joined!")
@@ -23,6 +25,8 @@ const JoinRoomPopup = ({onClose, code, hasPassword}) => {
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Failed to join room.")
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -44,6 +48,9 @@ const JoinRoomPopup = ({onClose, code, hasPassword}) => {
 
   return (
     <div className='flex w-xl h-[50vh] bg-orange items-center justify-center rounded-3xl'>
+      <div className="absolute w-fit bg-transparent top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+        <Spinner loading={isLoading} />
+      </div>
       <form 
       onSubmit={(e) => {
         e.preventDefault(); 

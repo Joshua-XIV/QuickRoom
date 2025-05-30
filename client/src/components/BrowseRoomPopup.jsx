@@ -61,7 +61,7 @@ const BrowseRoomPopup = ({onClose}) => {
   return (
     <>
       <div className='border-2 border-amber-500 bg-gray-400 min-w-96 sm:w-xl md:w-2xl h-[70vh] flex flex-col'>
-        <div className="absolute inset-0 bg-transparent flex items-center justify-center z-50">
+        <div className="absolute w-fit bg-transparent top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
           <Spinner loading={isLoading} />
         </div>
         <div className='w-full bg-gray-400 flex justify-between border-2 p-2'>
