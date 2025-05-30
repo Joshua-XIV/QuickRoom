@@ -2,8 +2,10 @@ import React, {useEffect, useState } from 'react'
 import { createRoom } from '../../api/createRoom'
 import {toast, ToastContainer} from 'react-toastify'
 import { useNavigate } from 'react-router-dom';
+import Spinner from './Spinner';
 
 const CreateRoomPopup = ({onClose}) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [maxUsers, setMaxUsers] = useState(10)
@@ -12,6 +14,7 @@ const CreateRoomPopup = ({onClose}) => {
   const navigate = useNavigate();
 
   const handleCreateRoom = async ({ username, password, maxUsers, isPrivate }) => {
+    setIsLoading(true)
     try {
       const data = await createRoom({ username, password, maxUsers, isPrivate });
       toast.success("Room Created!");
@@ -20,6 +23,8 @@ const CreateRoomPopup = ({onClose}) => {
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Failed to create room.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,7 +52,8 @@ const CreateRoomPopup = ({onClose}) => {
 
   return (
     <div className='flex w-xl h-[50vh] bg-orange items-center justify-center rounded-3xl'>
-      <form onSubmit={handleSubmit}  autoComplete="off" className='bg-white border-2 border-amber-500 rounded-3xl flex flex-col space-y-4 w-full h-full p-4'>
+      <Spinner loading={isLoading}></Spinner>
+      <form onSubmit={handleSubmit} autoComplete="off" className='bg-white border-2 border-amber-500 rounded-3xl flex flex-col space-y-4 w-full h-full p-4'>
         
         <div className='flex items-center'>
           <label htmlFor="usernameInput" className={labelStyle}>Username:</label>

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { getRooms } from '../../api/getRooms';
 import {toast} from 'react-toastify'
 import JoinRoomPopup from './JoinRoomPopup';
+import Spinner from './Spinner';
 
 const BrowseRoomPopup = ({onClose}) => {
   const [data, setData] = useState([])
@@ -10,6 +11,7 @@ const BrowseRoomPopup = ({onClose}) => {
   const [refresh, setRefresh] = useState(false)
   const [showJoinRoomPopup, setShowJoinRoomPop] = useState(false)
   const [sortByUsers, setSortByUsers] = useState(null);
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const handleEsc = (event) => {
@@ -25,12 +27,15 @@ const BrowseRoomPopup = ({onClose}) => {
   }, [onClose]);
 
   const handleGetRooms = async () => {
+    setIsLoading(true)
     try {
       const data = await getRooms();
       return data;
     } catch (err) {
       console.error(err)
       toast.error("Failed to Get Rooms");
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -56,6 +61,9 @@ const BrowseRoomPopup = ({onClose}) => {
   return (
     <>
       <div className='border-2 border-amber-500 bg-gray-400 min-w-96 sm:w-xl md:w-2xl h-[70vh] flex flex-col'>
+        <div className="absolute inset-0 bg-transparent flex items-center justify-center z-50">
+          <Spinner loading={isLoading} />
+        </div>
         <div className='w-full bg-gray-400 flex justify-between border-2 p-2'>
           <p className='ml-6'>Room</p>
           <div className='flex space-x-6'>
