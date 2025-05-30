@@ -1,8 +1,17 @@
 const express = require('express');
 const bcrypt = require('bcrypt')
 const app = express();
+const cors = require('cors');
 app.use(express.json());
 require('dotenv').config();
+
+const corsOptions = {
+    origin: 'https://quickroom.netlify.app',  // your frontend domain
+    methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true,
+  };
+  
+app.use(cors(corsOptions));
 
 const SALT_ROUNDS = 10;
 const rooms = {};
@@ -145,7 +154,7 @@ const { Server } = require('socket.io');
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: 'https://quickroom.netlify.app',
     methods: ['GET', 'POST'],
   },
 });
