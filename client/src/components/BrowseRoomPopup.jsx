@@ -60,15 +60,15 @@ const BrowseRoomPopup = ({onClose}) => {
 
   return (
     <>
-      <div className='border-2 border-amber-500 bg-gray-400 min-w-96 sm:w-xl md:w-2xl h-[70vh] flex flex-col'>
+      <div className='border-2 border-amber-500 bg-gray-400/40 min-w-96 sm:w-xl md:w-2xl h-[70vh] flex flex-col relative'>
         <div className="absolute w-fit bg-transparent top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
           <Spinner loading={isLoading} />
         </div>
-        <div className='w-full bg-gray-400 flex justify-between border-2 p-2'>
-          <p className='ml-6'>Room</p>
+        <div className='w-full bg-gray-400/80 flex justify-between border-2 p-2'>
+          <p className='ml-6 font-medium'>Room</p>
           <div className='flex space-x-6'>
             <p 
-            className='underline cursor-pointer'
+            className='underline cursor-pointer font-medium'
             onClick={() => {setSortByUsers((prev) => {
               if (prev === null) return 'asc';
               if (prev === 'asc') return 'desc';
@@ -79,7 +79,7 @@ const BrowseRoomPopup = ({onClose}) => {
               {sortByUsers === 'asc' && <span>↑</span>}
               {sortByUsers === 'desc' && <span>↓</span>}
             </p>
-            <p>Password</p>
+            <p className='font-medium'>Password</p>
           </div>
         </div>
         <div className='flex-grow overflow-y-auto'>
@@ -92,7 +92,7 @@ const BrowseRoomPopup = ({onClose}) => {
           .map(([code, room]) =>  {
             const isSelected = grabCode === code
             return (
-              <button className={`w-full ${isSelected ? "bg-amber-500" : "hover:bg-amber-200"}`} onClick={() => {setGrabCode(code); setGrabHasPassword(room.hasPassword)}} key={code}>
+              <button className={`w-full ${isSelected ? "bg-amber-500/50" : "hover:bg-amber-200/50"}`} onClick={() => {setGrabCode(code); setGrabHasPassword(room.hasPassword)}} key={code}>
                 <div className='flex justify-between border-x-2 border-b-2 p-4' key={code}>
                   <p className=''><strong>{code}</strong></p>
                   <div className='flex space-x-12'>
@@ -108,7 +108,7 @@ const BrowseRoomPopup = ({onClose}) => {
           <button type="button" onClick={onClose} className="px-4 py-2 border-2 bg-red-400 rounded cursor-pointer w-24 hover:bg-red-700">Cancel</button>
           <div className='space-x-12'>
             <button onClick={() => setRefresh(!refresh)} className='px-4 py-2 border-2 w-24 rounded bg-blue-500 cursor-pointer hover:bg-blue-700'>Refresh</button>
-            <button onClick={handleJoinRoomClick} className="px-4 py-2 w-24 bg-amber-500 border-2 text-black rounded cursor-pointer disabled:bg-amber-500/50 hover:bg-amber-600" disabled={!grabCode}>Join</button>
+            <button onClick={handleJoinRoomClick} className="px-4 py-2 w-24 bg-amber-500 border-2 text-black rounded cursor-pointer disabled:bg-amber-500/50 disabled:cursor-default hover:bg-amber-600" disabled={!grabCode}>Join</button>
           </div>
         </div>
       </div>

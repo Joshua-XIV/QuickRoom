@@ -33,6 +33,7 @@ const HomeSelection = () => {
     }
   
     try {
+      toast.info("Checking if room exists")
       const result = await hasPassword({ code: inputCode.trim() });
       if (result.success) {
         setJoinRoomPopup(true);
@@ -53,7 +54,7 @@ const HomeSelection = () => {
   return (
     <>
     <div className='flex justify-center items-center h-screen'>
-      <div className='flex flex-col justify-center items-center space-y-4'>
+      <div className={`flex flex-col justify-center items-center space-y-4 ${showBrowseRoomPop && 'hidden'}`}>
         <form onSubmit={(e) => {
             e.preventDefault();
             handleJoinRoomClick(); 
