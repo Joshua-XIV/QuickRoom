@@ -12,6 +12,6 @@ Can set your room to be private to avoid being on the Browse list
 
 **Known Bugs:** 
 
-Sometimes have to re-join rooms to see video
+Sometimes have to mute/unmute audio/video to see/hear others 
 
 https://quickroom.netlify.app/
