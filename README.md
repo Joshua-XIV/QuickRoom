@@ -1,6 +1,6 @@
 # QuickRoom
 
-**QuickRoom** is a personal project built to explore and integrate **WebSockets** and **WebRTC**, while gaining practical experience deploying a full-stack application. The user interface is intentionally minimal — the primary focus was on mastering real-time communication and full deployment workflows.
+**QuickRoom** is a personal project built to explore and integrate **WebSockets** and **WebRTC**, while gaining practical experience deploying a full-stack application. The user interface is intentionally minimal as the primary focus was on mastering real-time communication and full deployment workflows.
 
 🌐 [Live Demo](https://quickroom.netlify.app/)
 
