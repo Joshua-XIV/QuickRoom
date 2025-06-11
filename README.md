@@ -1,17 +1,54 @@
 # QuickRoom
 
-This is a personal project focused on learning and integrating WebSockets and WebRTC, as well as deploying both the backend and frontend to the web. The UI is intentionally simple, as the primary goal was to gain hands-on experience with real-time communication and full-stack deployment.
+**QuickRoom** is a personal project built to explore and integrate **WebSockets** and **WebRTC**, while gaining practical experience deploying a full-stack application. The user interface is intentionally minimal — the primary focus was on mastering real-time communication and full deployment workflows.
 
+🌐 [Live Demo](https://quickroom.netlify.app/)
 
-**Current Features:**  
+---
 
-Create a room for up to 20 users  
-Text Chat, Audio, and Video  
-Can set passwords for your rooms  
-Can set your room to be private to avoid being on the Browse list
+## Features
 
-**Known Bugs:** 
+- Create a room for up to 20 users  
+- Text Chat, Audio, and Video  
+- Optional password protection for rooms  
+- Private room setting to hide from public room list  
 
-Sometimes have to mute/unmute audio/video to see/hear others 
+---
 
-https://quickroom.netlify.app/
+## Known Issues
+
+- Occasionally requires users to mute/unmute audio or video to properly sync with others  
+
+---
+
+## **Built With**
+
+- **React**
+- **JavaScript**
+- **Node.js**
+- **Express.js**
+- **Tailwind CSS**
+
+---
+
+## **Key Concepts**
+
+- **React Hooks**
+- **WebRTC**
+- **Socket.IO**
+- **CORS**
+- **bcrypt**
+
+---
+
+## **Additional Tools & Practices**
+
+- **Netlify** for frontend deployment  
+- **Render** for backend deployment  
+- **ES Modules** with modular routing  
+- **RESTful API** for authentication and room management  
+- **In-memory state management** with cleanup logic for rooms and users  
+
+---
+
+> This project was created for educational purposes to gain hands-on experience with real-time applications and full-stack deployment.
